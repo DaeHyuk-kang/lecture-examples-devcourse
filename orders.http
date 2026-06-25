@@ -1,0 +1,10 @@
+### 주문 생성
+POST http://localhost:8080/orders
+Content-Type: application/json
+
+{
+  "userId": 1
+}
+
+### 전체 주문 목록 조회
+GET http://localhost:8080/orders
