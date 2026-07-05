@@ -1,42 +1,46 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '4.1.0'
-	id 'io.spring.dependency-management' version '1.1.7'
+    // 루트에서는 버전만 등록하고(apply false), 실제 적용은 각 모듈에서 한다.
+    id 'org.springframework.boot' version '4.1.0' apply false
+    id 'io.spring.dependency-management' version '1.1.7' apply false
 }
 
-group = 'com.growmighty.lectures.firstday'
-version = '0.0.1-SNAPSHOT'
+allprojects {
+    group = 'com.growmighty.lectures.firstday'
+    version = '0.0.1-SNAPSHOT'
 
-java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
-	}
+    repositories {
+        mavenCentral()
+    }
 }
 
-repositories {
-	mavenCentral()
-}
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'io.spring.dependency-management'
 
-dependencies {
-	implementation 'org.springframework.boot:spring-boot-h2console'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
-	// 정산 세션: Spring Batch (Job/Step/Chunk, JobRepository 메타데이터 테이블 포함)
-	implementation 'org.springframework.boot:spring-boot-starter-batch'
-	compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'com.h2database:h2'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
-	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
-	// 정산 세션: 배치 Job/Step 테스트 지원 (JobLauncherTestUtils 등)
-	testImplementation 'org.springframework.batch:spring-batch-test'
-	testCompileOnly 'org.projectlombok:lombok'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	testAnnotationProcessor 'org.projectlombok:lombok'
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
+    }
 
-    implementation("org.springframework.boot:spring-boot-starter-batch-jdbc")
-}
+    // Boot 플러그인을 적용하지 않은 모듈(common)도
+    // Spring Boot BOM으로 의존성 버전을 통일해서 관리한다.
+    dependencyManagement {
+        imports {
+            mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
+        }
+    }
 
-tasks.named('test') {
-	useJUnitPlatform()
+    dependencies {
+        // 모든 모듈이 공통으로 쓰는 것만 여기에 (Lombok)
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+        testCompileOnly 'org.projectlombok:lombok'
+        testAnnotationProcessor 'org.projectlombok:lombok'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    }
+
+    tasks.named('test') {
+        useJUnitPlatform()
+    }
 }
