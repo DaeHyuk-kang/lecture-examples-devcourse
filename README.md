@@ -35,10 +35,11 @@
 
 ---
 
-## log-statistics/ — 로그 통계 분석 프로그램 (별도 수강생 개인 프로젝트)
+## log-statistics/ — 로그 통계 분석 프로그램 (별도 특강)
 
 출처: `Programmers-Hyune-c/devcourse-lecture-25` 레포의 `develop` 브랜치.
 Open API 호출 웹 로그를 분석해 통계를 뽑아내는 프로그램을 단계적으로 확장하는 개인 과제.
+특강 내용은 실제 현업에서 AI의 입지가 어느 정도인지 체감할 수 있었음.
 
 | 태그 | 내용 |
 | --- | --- |
