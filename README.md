@@ -35,6 +35,23 @@
 
 ---
 
+## msa/ — 모놀리스 → MSA(마이크로서비스) 전환 강의
+
+`settlement` 강의가 끝난 모놀리스(`tangledmonolith`)를 실제 마이크로서비스로 쪼개나가는 강의.
+패키지 경계를 Gradle 모듈 경계로 승격 → 서비스 분리 → Eureka 서비스 디스커버리 → API Gateway 순으로 진행.
+`msa/` 폴더에 스냅샷 존재.
+
+| 태그 | 내용 |
+| --- | --- |
+| `lectures/msa/step1` | 시작 코드. settlement 강의 마지막 상태(모놀리스)와 동일 |
+| `lectures/msa/step1-done` | 멀티 모듈 전환: 단일 모놀리스 → common + 서비스 7개(product/payment/user/seller/cart/order/settlement). 서비스별 포트·DB 분리, 도메인 간 호출은 Port + RestClient로 전환, 패키지 경계를 컴파일 타임에 강제 |
+| `lectures/msa/step2` | Step1 결과 상태와 동일 (Step2 실습 시작 코드) |
+| `lectures/msa/step2-done` | 전 도메인에 Eureka 서비스 디스커버리 적용. user/seller/cart/settlement까지 Eureka 클라이언트로 등록하고, cart→product 호출도 이름 기반(@LoadBalanced) 방식으로 전환 |
+| `lectures/msa/step3` | Step2 결과 상태와 동일 (Step3 실습 시작 코드) |
+| `lectures/msa/step3-done` | API Gateway로 전체 도메인 라우팅 구성. `gateway-server`(Spring Cloud Gateway WebFlux, :8000) 추가, 7개 도메인 전체 라우트를 Eureka 기반 `lb://`로 이름 해석, 공통 응답 헤더 필터 적용 |
+
+---
+
 ## log-statistics/ — 로그 통계 분석 프로그램 (별도 특강)
 
 출처: `Programmers-Hyune-c/devcourse-lecture-25` 레포의 `develop` 브랜치.
