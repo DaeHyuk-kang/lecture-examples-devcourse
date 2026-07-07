@@ -11,6 +11,11 @@ dependencies {
 
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 
+    // 선언적 HTTP 클라이언트 — 인터페이스를 선언하면 구현체(프록시)가 생긴다.
+    // 이 스타터가 로드밸런서(spring-cloud-starter-loadbalancer)도 함께 끌고 온다.
+    // 버전이 없어도 되는 이유: 늘 그랬듯 Spring Cloud BOM 이 채워준다.
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
     runtimeOnly 'com.h2database:h2'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'

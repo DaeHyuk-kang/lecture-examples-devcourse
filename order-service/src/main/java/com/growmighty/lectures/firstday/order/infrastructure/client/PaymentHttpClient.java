@@ -3,16 +3,12 @@ package com.growmighty.lectures.firstday.order.infrastructure.client;
 import com.growmighty.lectures.firstday.common.exception.ServiceUnavailableException;
 import com.growmighty.lectures.firstday.order.application.port.PaymentPort;
 import com.growmighty.lectures.firstday.order.application.port.dto.PaymentResult;
-import com.growmighty.lectures.firstday.order.infrastructure.client.dto.ApiResponseBody;
 import com.growmighty.lectures.firstday.order.infrastructure.client.dto.PayBody;
 import com.growmighty.lectures.firstday.order.infrastructure.client.dto.PaymentApiData;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClient;
 
 import java.math.BigDecimal;
 
@@ -21,29 +17,21 @@ import java.math.BigDecimal;
 @RequiredArgsConstructor
 public class PaymentHttpClient implements PaymentPort {
 
-    private final RestClient paymentRestClient;
-    private final CircuitBreakerFactory circuitBreakerFactory;   // 추상화 타입으로 주입 — 구현체(Resilience4j)를 모른 채 쓴다
+    private final PaymentFeignClient paymentFeignClient;         // RestClient → Feign, 갈아 끼운 건 이 줄뿐
+    private final CircuitBreakerFactory circuitBreakerFactory;   // 문지기는 그대로
 
     @Override
     public PaymentResult pay(BigDecimal amount) {
-        // "payment" 라는 이름의 차단기를 통과시켜 호출한다.
-        // 이름이 곧 신원 — 성공/실패 통계와 상태(CLOSED/OPEN/…)가 이 이름 아래에 쌓인다.
+        // Step 5 와 완전히 동일 — 차단기는 "호출을 감싸는" 물건이라,
+        // 안에서 RestClient 가 뛰든 Feign 이 뛰든 관심이 없다. 추상화의 힘.
         return circuitBreakerFactory.create("payment").run(
             () -> callPay(amount),   // ① 본 호출 (평소엔 이게 실행된다)
             this::payFallback);      // ② 실패했거나, 차단기가 OPEN 이라 거부됐을 때 (plan B)
     }
 
-    // 기존 pay() 의 몸통 — 그대로 옮겨왔을 뿐, 한 글자도 안 바뀌었다.
+    // 몸통이 6줄 → 2줄. 하는 일은 완전히 같다.
     private PaymentResult callPay(BigDecimal amount) {
-        ApiResponseBody<PaymentApiData> body = paymentRestClient.post()
-            .uri("/payments")
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(new PayBody(amount))
-            .retrieve()
-            .body(new ParameterizedTypeReference<>() {
-            });
-
-        PaymentApiData data = body.data();
+        PaymentApiData data = paymentFeignClient.pay(new PayBody(amount)).data();
         return new PaymentResult(data.paymentId(), data.amount(), data.status());
     }
 
@@ -61,10 +49,7 @@ public class PaymentHttpClient implements PaymentPort {
 
     @Override
     public void cancel(Long paymentId) {
-        // 🏋️ 과제 1: cancel 도 같은 차단기("payment")를 통과하도록 바꿔 보자.
-        paymentRestClient.post()
-            .uri("/payments/{paymentId}/cancel", paymentId)
-            .retrieve()
-            .toBodilessEntity();
+        // 🏋️ Step 5 과제 1을 했다면: 차단기째로 Feign 위에 얹어 보세요. run() 안의 한 줄만 바뀝니다.
+        paymentFeignClient.cancel(paymentId);
     }
 }
