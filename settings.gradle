@@ -14,4 +14,6 @@ include 'order-service'     // :8080
 include 'discovery-server'   // :8761 (Eureka 관례 포트)
 include 'gateway-server'
 
+include 'config-server'
+
 

@@ -12,4 +12,7 @@ dependencies {
 
     // 명부에 등록하고, 명부 사본을 받아오는 능력 (lb:// 해석에 필요)
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+
+    // 부팅 시 config-server 에서 설정을 받아온다 (actuator 는 위에 이미 있음 — /actuator/refresh 겸용)
+    implementation 'org.springframework.cloud:spring-cloud-starter-config'
 }
